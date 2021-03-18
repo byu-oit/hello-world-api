@@ -69,10 +69,7 @@ module "my_fargate_api" {
     efs_volume_mounts = null
   }
 
-  autoscaling_config = {
-    min_capacity = 1
-    max_capacity = 2
-  }
+  autoscaling_config = null
 
   codedeploy_lifecycle_hooks = {
     BeforeInstall         = null
@@ -80,6 +77,29 @@ module "my_fargate_api" {
     AfterAllowTestTraffic = module.postman_test_lambda.lambda_function.function_name
     BeforeAllowTraffic    = null
     AfterAllowTraffic     = null
+  }
+}
+
+resource "aws_appautoscaling_target" "ecs_target" {
+  max_capacity       = 4
+  min_capacity       = 1
+  resource_id        = "service/${module.my_fargate_api.ecs_cluster.name}/${module.my_fargate_api.fargate_service.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+resource "aws_appautoscaling_policy" "ecs_policy" {
+  name               = "${local.name}-${var.env}"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ALBRequestCountPerTarget"
+    }
+    target_value = 200.0
   }
 }
 
