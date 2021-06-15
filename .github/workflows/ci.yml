@@ -7,7 +7,7 @@ on:
 env:
   node_version: "14.x"
   tf_version: "0.14.7" # must match value in terraform-iac/*/app/main.tf
-
+concurrency: ${{ github.base_ref }}
 jobs:
   env:
     name: Set Env Vars
