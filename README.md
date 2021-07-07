@@ -120,3 +120,7 @@ Several OIT created Terraform modules are used. You can look these modules up in
 There are a lot of moving parts in the CI/CD pipeline for this project. This diagram shows the interaction between various services during a deployment.
 
 ![CI/CD Sequence Diagram](doc/Fargate%20API%20CI%20CD.png)
+
+## Questions?
+
+Check out [the FAQ](doc/faq.md)!
